@@ -17,6 +17,7 @@
                 <th>Titolo</th>
                 <th>Slug</th>
                 <th>Autore</th>
+                <th>Tags</th>
                 <th class="text-center">Azioni</th>
                 </tr>
             </thead>
@@ -27,6 +28,9 @@
                     <td>{{ $post->title }}</td>
                     <td>{{ $post->slug }}</td>
                     <td>{{ $post->user->name }}</td>
+                    <td>
+                    <div>{{ $post->tags->implode('name', ' - ') }}</div>
+                    </td>
                     <td>
                     <a class="btn btn-info btn-sm" href="{{ route('admin.posts.show', ['post' => $post->slug]) }}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
