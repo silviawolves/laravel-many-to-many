@@ -22,8 +22,22 @@
                 @endif
             </div>
             <form action="{{ route('admin.posts.update', ['post' => $post->slug]) }}" method="post" enctype="multipart/form-data">
+
                 @csrf
                 @method('PUT')
+
+                <div class="form-group">
+                    <label for="cover_img_file" class="form-label">Immagine di copertina</label>
+                        <div class="d-flex">
+                            <img class="img-thumbnail" style="width: 150px" src="{{ asset('storage/' . $post->cover_img) }}">
+                            <img id="new_cover_img_container" src="" alt="">
+                            <input type="file" name="cover_img" class="form-control-file @error('cover_img') is-invalid @enderror"
+                                id="cover_img_file" value="{{ old('cover_img', $post->cover_img) }}">
+                        </div>
+                    @error('cover_img')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
                 <div class="form-group">
                     <label>Titolo</label>

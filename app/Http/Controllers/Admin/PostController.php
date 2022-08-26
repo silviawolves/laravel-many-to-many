@@ -7,6 +7,7 @@ use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -18,7 +19,6 @@ class PostController extends Controller
         if (!$post) {
             abort(404);
         }
-
         return $post;
     }
 
@@ -86,12 +86,17 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|min:10',
             'content' => 'required|min:10',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            'cover_img' => 'required|image'
         ]);
 
         $post = new Post();
         $post->fill($validatedData);
         $post->user_id = Auth::user()->id;
+
+        $coverImg = Storage::put('/post_covers', $validatedData['cover_img']);
+        $post->cover_img = $coverImg;
+
         $post->slug = $this->generateSlug($post->title);
         $post->save();
 
@@ -140,9 +145,18 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|min:10',
             'content' => 'required|min:10',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            'cover_img' => 'nullable|image'
         ]);
         $post = $this->findBySlug($slug);
+
+        if (key_exists('cover_img', $validatedData)) {
+            if ($post->cover_img) {
+                Storage::delete($post->cover_img);
+            }
+            $coverImg = Storage::put('/post_covers', $validatedData['cover_img']);
+            $post->cover_img = $coverImg;
+        }
 
         if ($validatedData['title'] !== $post->title) {
             $post->slug = $this->generateSlug($validatedData['title']);
